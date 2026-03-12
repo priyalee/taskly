@@ -1,0 +1,113 @@
+body{
+background:#e8ecef;
+font-family:sans-serif;
+}
+
+/* NOTEBOOK CONTAINER */
+
+.notebook{
+position:relative;
+width:400px;
+height:500px;
+perspective:1500px;
+}
+
+/* COVER */
+
+.cover{
+position:absolute;
+width:100%;
+height:100%;
+background:linear-gradient(135deg,#5f9cff,#7ed6df);
+border-radius:10px;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+color:white;
+cursor:pointer;
+transition:transform 1s;
+transform-origin:left;
+z-index:10;
+}
+
+.cover.open{
+transform:rotateY(-160deg);
+}
+
+/* PAGE */
+
+.page{
+background:white;
+width:100%;
+height:100%;
+border-radius:10px;
+padding:20px;
+box-shadow:0 15px 25px rgba(0,0,0,0.2);
+
+/* ruled lines */
+
+background-image:
+repeating-linear-gradient(
+white,
+white 28px,
+#d9e2ec 29px
+);
+}
+
+/* TASK ITEM */
+
+.list-group-item{
+background:transparent;
+border:none;
+display:flex;
+align-items:center;
+gap:10px;
+font-size:18px;
+animation:slideIn .3s ease;
+}
+
+/* TASK ANIMATION */
+
+@keyframes slideIn{
+from{
+transform:translateX(-20px);
+opacity:0;
+}
+to{
+transform:translateX(0);
+opacity:1;
+}
+}
+
+/* COMPLETED */
+
+.completed{
+text-decoration:line-through;
+color:gray;
+transition:.3s;
+}
+
+/* DELETE BUTTON */
+
+.delete-btn{
+margin-left:auto;
+border:none;
+background:none;
+color:red;
+font-size:18px;
+cursor:pointer;
+}
+
+/* FADE OUT */
+
+.fade-out{
+animation:fadeOut .3s forwards;
+}
+
+@keyframes fadeOut{
+to{
+opacity:0;
+transform:translateX(20px);
+}
+}
