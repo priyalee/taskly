@@ -4,16 +4,14 @@ body {
 }
 
 /* NOTEBOOK CONTAINER */
-
 .notebook {
     position: relative;
-    width: 400px;
-    height: 500px;
-    perspective: 1500px;
+    width: 90%; 
+    max-width: 480px; 
+    aspect-ratio: 6/7; 
+    perspective: 2000px;
 }
-
 /* COVER */
-
 .cover {
     position: absolute;
     width: 100%;
@@ -35,71 +33,84 @@ body {
     transform: rotateY(-160deg);
 }
 
-/* PAGE */
-
-.page {
-    background: white;
+/* PAGES CONTAINER */
+.pages-container {
+    position: absolute;
     width: 100%;
     height: 100%;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+}
+
+/* SINGLE PAGE */
+.page {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: white;
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
-
-    /* ruled lines */
-
-    background-image:
-        repeating-linear-gradient(white,
-            white 28px,
-            #d9e2ec 29px);
+    background-image: repeating-linear-gradient(white, white 30px, #c4cbd4 31px);
+    transition: transform 0.6s, opacity 0.6s;
 }
 
 /* TASK ITEM */
-
 .list-group-item {
+    display: flex;
+    align-items: center;     
+    gap: 12px;           
+    height: 30px;          
+    line-height: 30px;        
+    padding: 0 10px;          
+    font-size: 18px;       
+    font-weight: 500;
+    font-family: cursive;
     background: transparent;
     border: none;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 18px;
     animation: slideIn .3s ease;
 }
 
 /* TASK ANIMATION */
-
 @keyframes slideIn {
-    from {
-        transform: translateX(-20px);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
+    from { transform: translateX(-20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
 }
 
-/* COMPLETED */
+/* CHECKBOX STYLING */
+.list-group-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    cursor: pointer;
+}
 
-.completed {
-    text-decoration: line-through;
-    color: gray;
-    transition: .3s;
+/* TASK TEXT */
+.list-group-item .task-text {
+    flex-grow: 1;   /* fills space between checkbox and delete button */
+    user-select: none;
 }
 
 /* DELETE BUTTON */
-
-.delete-btn {
-    margin-left: auto;
+.list-group-item .delete-btn {
+    margin-left: auto; 
     border: none;
     background: none;
     color: red;
     font-size: 18px;
     cursor: pointer;
+    padding: 0;
 }
 
-/* FADE OUT */
+/* COMPLETED TASK */
+.list-group-item .completed {
+    text-decoration: line-through;
+    color: gray;
+    transition: 0.3s;
+}
 
+/* FADE OUT TASK */
 .fade-out {
     animation: fadeOut .3s forwards;
 }
@@ -108,5 +119,46 @@ body {
     to {
         opacity: 0;
         transform: translateX(20px);
+    }
+}
+
+/* NAVIGATION BUTTONS */
+.nav-buttons {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+}
+
+.nav-buttons button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #5f9cff;
+}
+
+.nav-buttons button:disabled {
+    color: gray;
+    cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+    .list-group-item {
+        font-size: 16px;
+        height: 28px;
+        line-height: 28px;
+        gap: 8px;
+    }
+
+    .list-group-item input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+    }
+
+    .nav-buttons button {
+        font-size: 20px;
     }
 }
