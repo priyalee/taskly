@@ -6,11 +6,12 @@ body {
 /* NOTEBOOK CONTAINER */
 .notebook {
     position: relative;
-    width: 90%; 
-    max-width: 480px; 
-    aspect-ratio: 6/7; 
+    width: 90%;
+    max-width: 600px;
+    aspect-ratio: 6/7;
     perspective: 2000px;
 }
+
 /* COVER */
 .cover {
     position: absolute;
@@ -48,6 +49,8 @@ body {
     position: absolute;
     width: 100%;
     height: 100%;
+    display: flex;
+    flex-direction: column;
     background: white;
     border-radius: 10px;
     padding: 20px;
@@ -59,12 +62,12 @@ body {
 /* TASK ITEM */
 .list-group-item {
     display: flex;
-    align-items: center;     
-    gap: 12px;           
-    height: 30px;          
-    line-height: 30px;        
-    padding: 0 10px;          
-    font-size: 18px;       
+    align-items: center;
+    gap: 12px;
+    height: 30px;
+    line-height: 30px;
+    padding: 0 10px;
+    font-size: 18px;
     font-weight: 500;
     font-family: cursive;
     background: transparent;
@@ -74,8 +77,15 @@ body {
 
 /* TASK ANIMATION */
 @keyframes slideIn {
-    from { transform: translateX(-20px); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
+    from {
+        transform: translateX(-20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
 /* CHECKBOX STYLING */
@@ -88,13 +98,14 @@ body {
 
 /* TASK TEXT */
 .list-group-item .task-text {
-    flex-grow: 1;   /* fills space between checkbox and delete button */
+    flex-grow: 1;
+    /* fills space between checkbox and delete button */
     user-select: none;
 }
 
 /* DELETE BUTTON */
 .list-group-item .delete-btn {
-    margin-left: auto; 
+    margin-left: auto;
     border: none;
     background: none;
     color: red;
@@ -161,4 +172,46 @@ body {
     .nav-buttons button {
         font-size: 20px;
     }
+}
+
+@media (max-width: 480px) {
+    .notebook {
+        width: 95%;
+        /* almost full width on small phones */
+        max-width: none;
+        /* remove max-width */
+    }
+
+    .page {
+        padding: 10px;
+    }
+
+}
+
+.task-list {
+    max-height: calc(100% - 120px);
+    /* leave space for header + input */
+    overflow-y: auto;
+    /* vertical scrollbar */
+    padding-right: 5px;
+    /* optional, avoid content hidden behind scrollbar */
+
+
+    max-height: calc(100% - 140px);
+    /* slightly more padding for mobile */
+}
+
+
+/* Optional: nice scrollbar styling for webkit browsers */
+.task-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.task-list::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+.task-list::-webkit-scrollbar-track {
+    background: transparent;
 }

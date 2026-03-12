@@ -2,12 +2,24 @@ const cover = document.getElementById("cover");
 const pagesContainer = document.getElementById("pagesContainer");
 const prevPageBtn = document.getElementById("prevPage");
 const nextPageBtn = document.getElementById("nextPage");
-
+const notebook = document.querySelector(".notebook");
 let currentPageIndex = 0;
-const pageHeight = 700; 
-const lineHeight = 30;  
-const tasksPerPage = Math.floor(pageHeight / lineHeight) - 6; 
 let allTasks = [];
+
+function getTasksPerPage() {
+    const pageHeight = notebook.offsetHeight; // actual notebook height
+    const lineHeight = 30;                    // same as your CSS
+    const padding = 60;                       // space for header/input
+    return Math.floor(pageHeight / lineHeight) - Math.floor(padding / lineHeight);
+}
+
+let tasksPerPage = getTasksPerPage();
+
+// Recalculate tasks per page on window resize
+window.addEventListener("resize", () => {
+    tasksPerPage = getTasksPerPage();
+    renderPages(); // re-render all pages with new tasksPerPage
+});
 
 /* COVER FLIP */
 cover.addEventListener("click", () => {
