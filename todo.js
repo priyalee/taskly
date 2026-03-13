@@ -18,19 +18,19 @@ function getTasksPerPage() {
 
 let tasksPerPage = getTasksPerPage();
 
-/* Resize */
+/* ----- RESIZE ----- */
 window.addEventListener("resize", () => {
   tasksPerPage = getTasksPerPage();
   renderPages();
 });
 
-/* COVER */
+/* ----- COVER OPEN ----- */
 cover.addEventListener("click", () => {
   cover.classList.add("open");
   if (!pagesContainer.children.length) createPage();
 });
 
-/* CREATE PAGE */
+/* ----- CREATE PAGE ----- */
 function createPage() {
   const page = document.createElement("div");
   page.className = "page";
@@ -62,47 +62,46 @@ function createPage() {
   const taskInput = page.querySelector(".task-input");
   const deletePageBtn = page.querySelector(".delete-page-btn");
 
+  // Mobile-friendly: click + touch
   addBtn.addEventListener("click", () => addTask(taskInput));
+  addBtn.addEventListener("touchstart", (e) => { e.preventDefault(); addTask(taskInput); });
 
-  taskInput.addEventListener("keypress", (e) => {
+  // Enter key
+  taskInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") addTask(taskInput);
   });
 
-  // Delete page with animation
-  deletePageBtn.addEventListener("click", () => {
-    page.classList.add("fade-out"); // trigger animation
-
-    setTimeout(() => {
-      const pageIndex = Array.from(pagesContainer.children).indexOf(page);
-      if (pageIndex > -1) {
-        // Remove tasks of this page
-        const start = pageIndex * tasksPerPage;
-        allTasks.splice(start, tasksPerPage);
-
-        // Re-render pages
-        renderPages();
-
-        // Adjust currentPageIndex
-        if (currentPageIndex >= pagesContainer.children.length) {
-          currentPageIndex = pagesContainer.children.length - 1;
-        }
-        showPage(currentPageIndex);
-        updateNavButtons();
-      }
-    }, 400); // match animation duration
-  });
+  // Delete page
+  deletePageBtn.addEventListener("click", () => deletePage(page));
 }
-/* ADD TASK */
-function addTask(input) {
-  const task = input.value.trim();
-  if (!task) return;
 
-  allTasks.push(task);
+/* ----- ADD TASK ----- */
+function addTask(input) {
+  const text = input.value.trim();
+  if (!text) return;
+
+  allTasks.push(text);
   input.value = "";
   renderPages();
 }
 
-/* RENDER PAGES */
+/* ----- DELETE PAGE ----- */
+function deletePage(page) {
+  page.classList.add("fade-out");
+  setTimeout(() => {
+    const pageIndex = Array.from(pagesContainer.children).indexOf(page);
+    if (pageIndex > -1) {
+      const start = pageIndex * tasksPerPage;
+      allTasks.splice(start, tasksPerPage);
+      renderPages();
+      if (currentPageIndex >= pagesContainer.children.length) currentPageIndex = pagesContainer.children.length - 1;
+      showPage(currentPageIndex);
+      updateNavButtons();
+    }
+  }, 400);
+}
+
+/* ----- RENDER PAGES ----- */
 function renderPages() {
   pagesContainer.innerHTML = "";
 
@@ -110,43 +109,38 @@ function renderPages() {
 
   for (let i = 0; i < totalPages; i++) {
     createPage();
-
     const page = pagesContainer.children[i];
     const taskList = page.querySelector(".task-list");
 
     const start = i * tasksPerPage;
     const end = start + tasksPerPage;
 
-    allTasks.slice(start, end).forEach((taskText) => {
+    allTasks.slice(start, end).forEach((taskText, idx) => {
       const li = document.createElement("li");
-
       li.className = "list-group-item";
-
       li.innerHTML = `
-                <input type="checkbox" class="form-check-input">
-                <span class="task-text">${taskText}</span>
-                <button class="delete-btn">✖</button>
-            `;
-
-      taskList.appendChild(li);
+        <input type="checkbox" class="form-check-input">
+        <span class="task-text">${taskText}</span>
+        <button class="delete-btn">✖</button>
+      `;
 
       const checkbox = li.querySelector("input");
       const text = li.querySelector(".task-text");
-
-      checkbox.addEventListener("change", () =>
-        text.classList.toggle("completed"),
-      );
-
       const deleteBtn = li.querySelector(".delete-btn");
 
+      // Toggle complete
+      checkbox.addEventListener("change", () => text.classList.toggle("completed"));
+
+      // Delete task
       deleteBtn.addEventListener("click", () => {
         li.classList.add("fade-out");
-
         setTimeout(() => {
-          allTasks = allTasks.filter((t) => t !== taskText);
+          allTasks.splice(start + idx, 1);
           renderPages();
         }, 300);
       });
+
+      taskList.appendChild(li);
     });
   }
 
@@ -155,7 +149,7 @@ function renderPages() {
   addPageNumbers();
 }
 
-/* SHOW PAGE */
+/* ----- SHOW PAGE ----- */
 function showPage(index) {
   Array.from(pagesContainer.children).forEach((p, i) => {
     p.style.transform = `translateX(${(i - index) * 100}%)`;
@@ -163,154 +157,95 @@ function showPage(index) {
   });
 }
 
-/* UPDATE BUTTONS */
+/* ----- UPDATE NAV BUTTONS ----- */
 function updateNavButtons() {
   prevPageBtn.disabled = currentPageIndex === 0;
-
-  nextPageBtn.disabled =
-    currentPageIndex === pagesContainer.children.length - 1;
+  nextPageBtn.disabled = currentPageIndex === pagesContainer.children.length - 1;
 }
 
-/* PREVIOUS BUTTON */
-prevPageBtn.addEventListener("click", () => {
+/* ----- NAVIGATION BUTTONS ----- */
+prevPageBtn.addEventListener("click", () => navigatePage(-1));
+nextPageBtn.addEventListener("click", () => navigatePage(1));
+
+function navigatePage(direction) {
   if (showAllPages) {
     showAllPages = false;
-    const pages = Array.from(pagesContainer.children);
-
-    pages.forEach((page) => {
+    Array.from(pagesContainer.children).forEach((page) => {
       page.style.display = "block";
       page.style.transform = "";
       page.style.opacity = "";
       page.style.zIndex = "";
     });
-
-    if (currentPageIndex > 0) currentPageIndex--;
-
-    showPage(currentPageIndex);
-    updateNavButtons();
-    return;
   }
+  currentPageIndex += direction;
+  if (currentPageIndex < 0) currentPageIndex = 0;
+  if (currentPageIndex >= pagesContainer.children.length) currentPageIndex = pagesContainer.children.length - 1;
+  showPage(currentPageIndex);
+  updateNavButtons();
+}
 
-  if (currentPageIndex > 0) {
-    currentPageIndex--;
-
-    showPage(currentPageIndex);
-    updateNavButtons();
-  }
-});
-
-/* NEXT BUTTON */
-nextPageBtn.addEventListener("click", () => {
-  if (showAllPages) {
-    showAllPages = false;
-    const pages = Array.from(pagesContainer.children);
-
-    pages.forEach((page) => {
+/* ----- SHOW ALL / SPREAD PAGES ----- */
+centerPageBtn.addEventListener("click", () => {
+  showAllPages = !showAllPages;
+  if (showAllPages) showAll();
+  else {
+    Array.from(pagesContainer.children).forEach((page) => {
       page.style.display = "block";
-      page.style.transform = "";
-      page.style.opacity = "";
       page.style.zIndex = "";
     });
-
-    if (currentPageIndex < pagesContainer.children.length - 1) {
-      currentPageIndex++;
-    }
-
-    showPage(currentPageIndex);
-    updateNavButtons();
-    return;
-  }
-
-  if (currentPageIndex < pagesContainer.children.length - 1) {
-    currentPageIndex++;
-
     showPage(currentPageIndex);
     updateNavButtons();
   }
 });
 
-/* SHOW ALL PAGES */
 function showAll() {
   const pages = Array.from(pagesContainer.children);
   const total = pages.length;
-  const containerWidth = pagesContainer.offsetWidth; // responsive base
+  const containerWidth = pagesContainer.offsetWidth;
 
   pages.forEach((page, i) => {
     page.style.display = "block";
     page.style.position = "absolute";
-    page.style.transformOrigin = "left center"; 
+    page.style.transformOrigin = "left center";
     page.style.cursor = "pointer";
 
-    // Responsive fraction
     const fraction = i / (total - 1);
-
-    // Horizontal & vertical offsets scaled to container
-    const fanOffsetX = fraction * (containerWidth * 0.4); // up to 40% width spread
-    const fanOffsetY = fraction * 5; // small vertical layering
-
-    // Rotate: less left tilt, more right tilt
-    const rotateY = -5 + Math.pow(fraction, 1.5) * 25; 
+    const fanOffsetX = fraction * (containerWidth * 0.4);
+    const fanOffsetY = fraction * 5;
+    const rotateY = -5 + Math.pow(fraction, 1.5) * 25;
     const rotateZ = -1 + fraction * 4;
 
     page.style.transform = `translate(${fanOffsetX}px, ${fanOffsetY}px) rotateY(${rotateY}deg) rotateZ(${rotateZ}deg)`;
     page.style.zIndex = -i;
     page.style.opacity = 2.5;
 
-    // Click to open page
     page.onclick = () => {
       showAllPages = false;
       currentPageIndex = i;
-
       page.style.transition = "transform 0.4s ease";
       page.style.transform = "translate(0px,0px) scale(1.05) rotateY(0deg) rotateZ(0deg)";
-
       setTimeout(() => {
-        pages.forEach(p => {
-          p.style.transform = "";
-          p.style.zIndex = "";
-        });
+        pages.forEach(p => { p.style.transform = ""; p.style.zIndex = ""; });
         showPage(currentPageIndex);
         updateNavButtons();
       }, 400);
     };
   });
 }
-/* CENTER BUTTON */
-centerPageBtn.addEventListener("click", () => {
-  showAllPages = !showAllPages;
 
-  if (showAllPages) {
-    showAll(); // spread pages
-  } else {
-    // return to normal notebook mode
-    const pages = Array.from(pagesContainer.children);
-
-    pages.forEach((page) => {
-      page.style.display = "block"; // IMPORTANT FIX
-      page.style.zIndex = "";
-    });
-
-    showPage(currentPageIndex);
-    updateNavButtons();
-  }
-});
-
-
+/* ----- PAGE NUMBERS ----- */
 function addPageNumbers() {
-  const pages = Array.from(pagesContainer.children);
-
-  pages.forEach((page, i) => {
+  Array.from(pagesContainer.children).forEach((page, i) => {
     let pageNumber = page.querySelector(".page-number");
-
     if (!pageNumber) {
       pageNumber = document.createElement("div");
       pageNumber.classList.add("page-number");
       page.appendChild(pageNumber);
     }
-
     pageNumber.textContent = i + 1;
   });
 }
+
 
 renderPages();
 addPageNumbers();
