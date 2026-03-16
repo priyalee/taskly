@@ -18,19 +18,19 @@ function getTasksPerPage() {
 
 let tasksPerPage = getTasksPerPage();
 
-/* ----- RESIZE ----- */
+/* RESIZE */
 window.addEventListener("resize", () => {
   tasksPerPage = getTasksPerPage();
   renderPages();
 });
 
-/* ----- COVER OPEN ----- */
+/* COVER OPEN */
 cover.addEventListener("click", () => {
   cover.classList.add("open");
   if (!pagesContainer.children.length) createPage();
 });
 
-/* ----- CREATE PAGE ----- */
+/* CREATE PAGE */
 function createPage() {
   const page = document.createElement("div");
   page.className = "page";
@@ -75,7 +75,7 @@ function createPage() {
   deletePageBtn.addEventListener("click", () => deletePage(page));
 }
 
-/* ----- ADD TASK ----- */
+/* ADD TASK */
 function addTask(input) {
   const text = input.value.trim();
   if (!text) return;
@@ -85,7 +85,7 @@ function addTask(input) {
   renderPages();
 }
 
-/* ----- DELETE PAGE ----- */
+/* DELETE PAGE */
 function deletePage(page) {
   page.classList.add("fade-out");
   setTimeout(() => {
@@ -101,7 +101,7 @@ function deletePage(page) {
   }, 400);
 }
 
-/* ----- RENDER PAGES ----- */
+/* RENDER PAGES */
 function renderPages() {
   pagesContainer.innerHTML = "";
 
@@ -149,7 +149,7 @@ function renderPages() {
   addPageNumbers();
 }
 
-/* ----- SHOW PAGE ----- */
+/* SHOW PAGE */
 function showPage(index) {
   Array.from(pagesContainer.children).forEach((p, i) => {
     p.style.transform = `translateX(${(i - index) * 100}%)`;
@@ -157,13 +157,13 @@ function showPage(index) {
   });
 }
 
-/* ----- UPDATE NAV BUTTONS ----- */
+/* UPDATE NAV BUTTONS */
 function updateNavButtons() {
   prevPageBtn.disabled = currentPageIndex === 0;
   nextPageBtn.disabled = currentPageIndex === pagesContainer.children.length - 1;
 }
 
-/* ----- NAVIGATION BUTTONS ----- */
+/* NAVIGATION BUTTONS */
 prevPageBtn.addEventListener("click", () => navigatePage(-1));
 nextPageBtn.addEventListener("click", () => navigatePage(1));
 
@@ -184,7 +184,7 @@ function navigatePage(direction) {
   updateNavButtons();
 }
 
-/* ----- SHOW ALL / SPREAD PAGES ----- */
+/* SHOW ALL / SPREAD PAGES */
 centerPageBtn.addEventListener("click", () => {
   showAllPages = !showAllPages;
   if (showAllPages) showAll();
@@ -233,7 +233,7 @@ function showAll() {
   });
 }
 
-/* ----- PAGE NUMBERS ----- */
+/* PAGE NUMBERS */
 function addPageNumbers() {
   Array.from(pagesContainer.children).forEach((page, i) => {
     let pageNumber = page.querySelector(".page-number");
@@ -246,6 +246,16 @@ function addPageNumbers() {
   });
 }
 
+/* INITIAL TASKS */
+const tasks = [
+  "Buy groceries", "Finish project", "Call friend", "Clean room",
+  "Read a book", "Workout", "Study JavaScript", "Reply to emails"
+];
+
+for (let i = 0; i < 200; i++) {
+  const random = tasks[Math.floor(Math.random() * tasks.length)];
+  allTasks.push(random + " " + (i + 1));
+}
 
 renderPages();
 addPageNumbers();
