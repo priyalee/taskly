@@ -57,7 +57,7 @@ function createPage(pageIndex) {
     </div>
 
     <div class="input-group mb-3">
-      <input type="text" class="form-control task-input-${pageIndex}" placeholder="Add new task">
+      <input type="text" class="form-control task-input-${pageIndex}" placeholder="Add new task" onclick="$event.stopproppagation()">
       <button class="btn btn-primary add-btn-${pageIndex}">Add</button>
     </div>
 
@@ -296,20 +296,20 @@ notebook.addEventListener("touchend", (e) => {
 });
 
 /*SAMPLE TASKS*/
-// const tasks = [
-//   "Buy groceries",
-//   "Finish project",
-//   "Call friend",
-//   "Clean room",
-//   "Read a book",
-//   "Workout",
-//   "Study JavaScript",
-//   "Reply to emails",
-// ];
+const tasks = [
+  "Buy groceries",
+  "Finish project",
+  "Call friend",
+  "Clean room",
+  "Read a book",
+  "Workout",
+  "Study JavaScript",
+  "Reply to emails",
+];
 
-// for (let i = 0; i < 360; i++) {
-//   const random = tasks[Math.floor(Math.random() * tasks.length)];
-//   allTasks.push(random + " " + (i + 1));
-// }
+for (let i = 0; i < 160; i++) {
+  const random = tasks[Math.floor(Math.random() * tasks.length)];
+  allTasks.push(random + " " + (i + 1));
+}
 
 renderPages();
