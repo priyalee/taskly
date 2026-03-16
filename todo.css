@@ -9,12 +9,21 @@ body {
 /* NOTEBOOK CONTAINER */
 .notebook {
     position: relative;
-    width: 80vw; 
-    max-width: 600px;
-    aspect-ratio: 6/7;
+    width: min(95vw, 600px);
+    height: min(85vh, 700px);
+
     perspective: 1500px;
-    margin: 20px auto;
+    margin: auto;
+
     transition: transform 0.35s ease, opacity 0.35s ease, filter 0.35s ease;
+}
+
+.notebook-wrapper{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    padding:10px;
 }
 
 /* COVER */
@@ -209,30 +218,54 @@ body {
     }
 }
 
-/* SMALL SCREENS */
-@media (max-width: 600px) and (min-width: 481px) {
-    .notebook {
-        width: 90vw;
-        height: 85vh; 
-        max-width: 95vw;
-        aspect-ratio: auto;
+/* TABLETS */
+@media (max-width:1024px){
+
+    .notebook{
+        width:90vw;
+        height:85vh;
     }
-    .page {
-        background-size: 100% 28px;
-    }
+
 }
 
-/* EXTRA SMALL SCREENS */
-@media (max-width: 480px) {
-    .notebook {
-        width: 95vw;
-        height: 90vh;
-        max-width: 100vw;
-        aspect-ratio: auto;
+/* MOBILE */
+@media (max-width:600px){
+
+    .notebook{
+        width:95vw;
+        height:82vh;
     }
-    .page {
-        background-size: 100% 26px;
+
+    .page{
+        padding:15px;
+        background-size:100% 26px;
     }
+
+    .list-group-item{
+        font-size:16px;
+        height:26px;
+        line-height:26px;
+    }
+
+}
+
+/* SMALL PHONES */
+@media (max-width:420px){
+
+    .notebook{
+        width:96vw;
+        height:80vh;
+    }
+
+    .page{
+        padding:12px;
+        background-size:100% 24px;
+    }
+
+    .nav-buttons button{
+        font-size:20px;
+    }
+
 }
 
 /* Page delete animation */

@@ -4,16 +4,24 @@ const prevPageBtn = document.getElementById("prevPage");
 const nextPageBtn = document.getElementById("nextPage");
 const notebook = document.querySelector(".notebook");
 const centerPageBtn = document.getElementById("centerPage");
+const addPageBtn = document.getElementById("addPageBtn");
 
 let currentPageIndex = 0;
 let allTasks = [];
 let showAllPages = false;
 
 function getTasksPerPage() {
-  const pageHeight = notebook.offsetHeight;
-  const lineHeight = 30;
-  const padding = 60;
-  return Math.floor(pageHeight / lineHeight) - Math.floor(padding / lineHeight);
+
+  const pageHeight = notebook.clientHeight;
+
+  let lineHeight = 30;
+
+  if (window.innerWidth < 600) lineHeight = 26;
+  if (window.innerWidth < 420) lineHeight = 24;
+
+  const padding = 120;
+
+  return Math.max(4, Math.floor((pageHeight - padding) / lineHeight));
 }
 
 let tasksPerPage = getTasksPerPage();
@@ -199,41 +207,50 @@ centerPageBtn.addEventListener("click", () => {
 });
 
 function showAll() {
+
   const pages = Array.from(pagesContainer.children);
-  const total = pages.length;
-  const containerWidth = pagesContainer.offsetWidth;
+  const visibleStack = 10;   
 
   pages.forEach((page, i) => {
+
     page.style.display = "block";
     page.style.position = "absolute";
     page.style.transformOrigin = "left center";
     page.style.cursor = "pointer";
 
-    const fraction = i / (total - 1);
-    const fanOffsetX = fraction * (containerWidth * 0.4);
-    const fanOffsetY = fraction * 5;
-    const rotateY = -5 + Math.pow(fraction, 1.5) * 25;
-    const rotateZ = -1 + fraction * 4;
+    const stackIndex = Math.min(i, visibleStack);
 
-    page.style.transform = `translate(${fanOffsetX}px, ${fanOffsetY}px) rotateY(${rotateY}deg) rotateZ(${rotateZ}deg)`;
-    page.style.zIndex = -i;
-    page.style.opacity = 2.5;
+    const offsetX = stackIndex * 12;   
+    const offsetY = stackIndex * 1.5;
+
+    page.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+
+    // keep earlier pages on top
+    page.style.zIndex = pages.length - i;
+
+    page.style.opacity = 1;
+
+    // ensure page numbers stay above
+    const pageNumber = page.querySelector(".page-number");
+    if (pageNumber) pageNumber.style.zIndex = pages.length + 5;
 
     page.onclick = () => {
+
       showAllPages = false;
       currentPageIndex = i;
-      page.style.transition = "transform 0.4s ease";
-      page.style.transform = "translate(0px,0px) scale(1.05) rotateY(0deg) rotateZ(0deg)";
-      setTimeout(() => {
-        pages.forEach(p => { p.style.transform = ""; p.style.zIndex = ""; });
-        showPage(currentPageIndex);
-        updateNavButtons();
-      }, 400);
-    };
-  });
-}
 
-/* PAGE NUMBERS */
+      pages.forEach(p => {
+        p.style.transform = "";
+        p.style.zIndex = "";
+      });
+
+      showPage(currentPageIndex);
+      updateNavButtons();
+    };
+
+  });
+
+}/* PAGE NUMBERS */
 function addPageNumbers() {
   Array.from(pagesContainer.children).forEach((page, i) => {
     let pageNumber = page.querySelector(".page-number");
@@ -246,13 +263,13 @@ function addPageNumbers() {
   });
 }
 
-/* INITIAL TASKS */
+// /* INITIAL TASKS */
 // const tasks = [
 //   "Buy groceries", "Finish project", "Call friend", "Clean room",
 //   "Read a book", "Workout", "Study JavaScript", "Reply to emails"
 // ];
 
-// for (let i = 0; i < 200; i++) {
+// for (let i = 0; i < 500; i++) {
 //   const random = tasks[Math.floor(Math.random() * tasks.length)];
 //   allTasks.push(random + " " + (i + 1));
 // }
