@@ -247,15 +247,15 @@ function addPageNumbers() {
 }
 
 /* INITIAL TASKS */
-const tasks = [
-  "Buy groceries", "Finish project", "Call friend", "Clean room",
-  "Read a book", "Workout", "Study JavaScript", "Reply to emails"
-];
+// const tasks = [
+//   "Buy groceries", "Finish project", "Call friend", "Clean room",
+//   "Read a book", "Workout", "Study JavaScript", "Reply to emails"
+// ];
 
-for (let i = 0; i < 200; i++) {
-  const random = tasks[Math.floor(Math.random() * tasks.length)];
-  allTasks.push(random + " " + (i + 1));
-}
+// for (let i = 0; i < 200; i++) {
+//   const random = tasks[Math.floor(Math.random() * tasks.length)];
+//   allTasks.push(random + " " + (i + 1));
+// }
 
 renderPages();
 addPageNumbers();
