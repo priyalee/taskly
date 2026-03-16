@@ -5,14 +5,17 @@ const nextPageBtn = document.getElementById("nextPage");
 const notebook = document.querySelector(".notebook");
 const centerPageBtn = document.getElementById("centerPage");
 const addPageBtn = document.getElementById("addPageBtn");
+const previewIndicator = document.getElementById("previewIndicator");
 
 let currentPageIndex = 0;
 let allTasks = [];
 let showAllPages = false;
+let previewPage = 0;
+const previewLimit = 10;
 
 function getTasksPerPage() {
 
-  const pageHeight = notebook.clientHeight;
+  const pageHeight = notebook.clientHeight || 500;
 
   let lineHeight = 30;
 
@@ -27,9 +30,19 @@ function getTasksPerPage() {
 let tasksPerPage = getTasksPerPage();
 
 /* RESIZE */
+let resizeTimer;
+
 window.addEventListener("resize", () => {
-  tasksPerPage = getTasksPerPage();
-  renderPages();
+
+  clearTimeout(resizeTimer);
+
+  resizeTimer = setTimeout(() => {
+
+    tasksPerPage = getTasksPerPage();
+    renderPages();
+
+  }, 200);
+
 });
 
 /* COVER OPEN */
@@ -40,83 +53,108 @@ cover.addEventListener("click", () => {
 
 /* CREATE PAGE */
 function createPage() {
+
   const page = document.createElement("div");
   page.className = "page";
 
   page.innerHTML = `
     <div class="page-header" style="position: relative;">
       <h3 class="text-center m-3">Todo List</h3>
+
       <button class="delete-page-btn" title="Delete Page" style="
-        position: absolute;
-        top: 12px;
-        left: 5px;
-        border: none;
-        background: transparent;
-        font-size: 18px;
-        cursor: pointer;
-      "><i class="fa-solid fa-trash"></i></button>
+        position:absolute;
+        top:12px;
+        left:5px;
+        border:none;
+        background:transparent;
+        font-size:18px;
+        cursor:pointer;
+      ">
+        <i class="fa-solid fa-trash"></i>
+      </button>
+
     </div>
+
     <div class="input-group mb-3">
         <input type="text" class="form-control task-input" placeholder="Add new task">
         <button class="btn btn-primary add-btn">Add</button>
     </div>
+
     <ul class="list-group task-list"></ul>
   `;
 
   pagesContainer.appendChild(page);
-  showPage(currentPageIndex);
 
   const addBtn = page.querySelector(".add-btn");
   const taskInput = page.querySelector(".task-input");
   const deletePageBtn = page.querySelector(".delete-page-btn");
 
-  // Mobile-friendly: click + touch
   addBtn.addEventListener("click", () => addTask(taskInput));
-  addBtn.addEventListener("touchstart", (e) => { e.preventDefault(); addTask(taskInput); });
+  addBtn.addEventListener("touchstart", e => { e.preventDefault(); addTask(taskInput); });
 
-  // Enter key
-  taskInput.addEventListener("keydown", (e) => {
+  taskInput.addEventListener("keydown", e => {
     if (e.key === "Enter") addTask(taskInput);
   });
 
-  // Delete page
   deletePageBtn.addEventListener("click", () => deletePage(page));
 }
 
 /* ADD TASK */
 function addTask(input) {
+
   const text = input.value.trim();
   if (!text) return;
 
   allTasks.push(text);
+
   input.value = "";
+
   renderPages();
 }
 
 /* DELETE PAGE */
 function deletePage(page) {
+
   page.classList.add("fade-out");
+
   setTimeout(() => {
+
     const pageIndex = Array.from(pagesContainer.children).indexOf(page);
+
     if (pageIndex > -1) {
+
       const start = pageIndex * tasksPerPage;
+
       allTasks.splice(start, tasksPerPage);
+
       renderPages();
-      if (currentPageIndex >= pagesContainer.children.length) currentPageIndex = pagesContainer.children.length - 1;
+
+      if (currentPageIndex >= pagesContainer.children.length)
+        currentPageIndex = pagesContainer.children.length - 1;
+
       showPage(currentPageIndex);
       updateNavButtons();
     }
+
   }, 400);
 }
 
 /* RENDER PAGES */
 function renderPages() {
+
   pagesContainer.innerHTML = "";
 
-  const totalPages = Math.ceil(allTasks.length / tasksPerPage);
+  let totalPages = Math.ceil(allTasks.length / tasksPerPage);
+
+  if (totalPages === 0) totalPages = 1;
+
+  if (currentPageIndex >= totalPages)
+    currentPageIndex = totalPages - 1;
 
   for (let i = 0; i < totalPages; i++) {
+
     createPage();
+
     const page = pagesContainer.children[i];
     const taskList = page.querySelector(".task-list");
 
@@ -124,8 +162,13 @@ function renderPages() {
     const end = start + tasksPerPage;
 
     allTasks.slice(start, end).forEach((taskText, idx) => {
+
+      if (!taskText) return;
+
       const li = document.createElement("li");
+
       li.className = "list-group-item";
+
       li.innerHTML = `
         <input type="checkbox" class="form-check-input">
         <span class="task-text">${taskText}</span>
@@ -136,20 +179,28 @@ function renderPages() {
       const text = li.querySelector(".task-text");
       const deleteBtn = li.querySelector(".delete-btn");
 
-      // Toggle complete
-      checkbox.addEventListener("change", () => text.classList.toggle("completed"));
+      checkbox.addEventListener("change", () =>
+        text.classList.toggle("completed")
+      );
 
-      // Delete task
       deleteBtn.addEventListener("click", () => {
+
         li.classList.add("fade-out");
+
         setTimeout(() => {
+
           allTasks.splice(start + idx, 1);
+
           renderPages();
+
         }, 300);
+
       });
 
       taskList.appendChild(li);
+
     });
+
   }
 
   showPage(currentPageIndex);
@@ -159,120 +210,203 @@ function renderPages() {
 
 /* SHOW PAGE */
 function showPage(index) {
-  Array.from(pagesContainer.children).forEach((p, i) => {
+
+  if (pagesContainer.classList.contains("preview-mode")) return;
+
+  const pages = Array.from(pagesContainer.children);
+
+  if (index >= pages.length) index = pages.length - 1;
+  if (index < 0) index = 0;
+
+  currentPageIndex = index;
+
+  pages.forEach((p, i) => {
+
     p.style.transform = `translateX(${(i - index) * 100}%)`;
     p.style.opacity = i === index ? 1 : 0;
+
   });
+
 }
 
 /* UPDATE NAV BUTTONS */
 function updateNavButtons() {
+
   prevPageBtn.disabled = currentPageIndex === 0;
-  nextPageBtn.disabled = currentPageIndex === pagesContainer.children.length - 1;
+
+  nextPageBtn.disabled =
+    currentPageIndex === pagesContainer.children.length - 1;
 }
 
-/* NAVIGATION BUTTONS */
+/* NAV BUTTONS */
 prevPageBtn.addEventListener("click", () => navigatePage(-1));
 nextPageBtn.addEventListener("click", () => navigatePage(1));
 
 function navigatePage(direction) {
+
+  const pages = Array.from(pagesContainer.children);
+
   if (showAllPages) {
-    showAllPages = false;
-    Array.from(pagesContainer.children).forEach((page) => {
-      page.style.display = "block";
-      page.style.transform = "";
-      page.style.opacity = "";
-      page.style.zIndex = "";
-    });
+
+    const totalPreviewPages = Math.ceil(pages.length / previewLimit);
+
+    previewPage += direction;
+
+    if (previewPage < 0) previewPage = 0;
+
+    if (previewPage >= totalPreviewPages)
+      previewPage = totalPreviewPages - 1;
+
+    showAll();
+    return;
   }
+
   currentPageIndex += direction;
+
   if (currentPageIndex < 0) currentPageIndex = 0;
-  if (currentPageIndex >= pagesContainer.children.length) currentPageIndex = pagesContainer.children.length - 1;
+
+  if (currentPageIndex >= pages.length)
+    currentPageIndex = pages.length - 1;
+
   showPage(currentPageIndex);
+
   updateNavButtons();
 }
 
-/* SHOW ALL / SPREAD PAGES */
+/* PREVIEW MODE */
 centerPageBtn.addEventListener("click", () => {
+
   showAllPages = !showAllPages;
-  if (showAllPages) showAll();
-  else {
-    Array.from(pagesContainer.children).forEach((page) => {
+
+  if (showAllPages) {
+
+    previewPage = Math.floor(currentPageIndex / previewLimit);
+
+    showAll();
+
+  } else {
+
+    pagesContainer.classList.remove("preview-mode");
+
+    previewIndicator.style.display = "none";
+
+    Array.from(pagesContainer.children).forEach(page => {
+
       page.style.display = "block";
-      page.style.zIndex = "";
+      page.style.transform = "";
+      page.style.opacity = "";
+
     });
+
     showPage(currentPageIndex);
+
     updateNavButtons();
   }
+
 });
 
 function showAll() {
 
   const pages = Array.from(pagesContainer.children);
-  const visibleStack = 10;   
+
+  pagesContainer.classList.add("preview-mode");
+
+  const start = previewPage * previewLimit;
+  const end = start + previewLimit;
 
   pages.forEach((page, i) => {
 
-    page.style.display = "block";
-    page.style.position = "absolute";
-    page.style.transformOrigin = "left center";
-    page.style.cursor = "pointer";
-
-    const stackIndex = Math.min(i, visibleStack);
-
-    const offsetX = stackIndex * 12;   
-    const offsetY = stackIndex * 1.5;
-
-    page.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
-
-    // keep earlier pages on top
-    page.style.zIndex = pages.length - i;
-
-    page.style.opacity = 1;
-
-    // ensure page numbers stay above
-    const pageNumber = page.querySelector(".page-number");
-    if (pageNumber) pageNumber.style.zIndex = pages.length + 5;
+    if (i >= start && i < end)
+      page.style.display = "block";
+    else
+      page.style.display = "none";
 
     page.onclick = () => {
 
       showAllPages = false;
+      previewPage = 0;
+
+      pagesContainer.classList.remove("preview-mode");
+
       currentPageIndex = i;
 
-      pages.forEach(p => {
-        p.style.transform = "";
-        p.style.zIndex = "";
-      });
-
       showPage(currentPageIndex);
+
       updateNavButtons();
+
     };
 
   });
 
-}/* PAGE NUMBERS */
-function addPageNumbers() {
-  Array.from(pagesContainer.children).forEach((page, i) => {
-    let pageNumber = page.querySelector(".page-number");
-    if (!pageNumber) {
-      pageNumber = document.createElement("div");
-      pageNumber.classList.add("page-number");
-      page.appendChild(pageNumber);
-    }
-    pageNumber.textContent = i + 1;
-  });
+  const totalPreviewPages = Math.ceil(pages.length / previewLimit);
+
 }
 
-// /* INITIAL TASKS */
+/* PAGE NUMBERS */
+function addPageNumbers() {
+
+  Array.from(pagesContainer.children).forEach((page, i) => {
+
+    let pageNumber = page.querySelector(".page-number");
+
+    if (!pageNumber) {
+
+      pageNumber = document.createElement("div");
+
+      pageNumber.classList.add("page-number");
+
+      page.appendChild(pageNumber);
+
+    }
+
+    pageNumber.textContent = i + 1;
+
+  });
+
+}
+
+
+/* SWIPE */
+let startX = 0;
+
+notebook.addEventListener("touchstart", e => {
+
+  if (e.target.closest("input") || e.target.closest("button")) return;
+
+  startX = e.touches[0].clientX;
+
+});
+
+notebook.addEventListener("touchend", e => {
+
+  const endX = e.changedTouches[0].clientX;
+
+  if (endX - startX > 60) navigatePage(-1);
+
+  if (startX - endX > 60) navigatePage(1);
+
+});
+
+/* SAMPLE TASKS */
 // const tasks = [
-//   "Buy groceries", "Finish project", "Call friend", "Clean room",
-//   "Read a book", "Workout", "Study JavaScript", "Reply to emails"
+//   "Buy groceries",
+//   "Finish project",
+//   "Call friend",
+//   "Clean room",
+//   "Read a book",
+//   "Workout",
+//   "Study JavaScript",
+//   "Reply to emails"
 // ];
 
 // for (let i = 0; i < 500; i++) {
+
 //   const random = tasks[Math.floor(Math.random() * tasks.length)];
+
 //   allTasks.push(random + " " + (i + 1));
+
 // }
+
 
 renderPages();
 addPageNumbers();
