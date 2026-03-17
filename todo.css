@@ -243,15 +243,29 @@ body {
     }
 }
 
-/* PREVIEW MODE */
+/* DEFAULT PREVIEW */
 .preview-mode {
     display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 14px;
     padding: 10px;
     height: 100%;
     overflow-y: auto;
     grid-auto-rows: min-content;
+}
+
+/* MANY PAGES */
+.preview-mode.many-pages {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+}
+
+/* TWO PAGES */
+.preview-mode.two-pages {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+/* ONE PAGE */
+.preview-mode.one-page {
+    grid-template-columns: 1fr;
 }
 
 .preview-mode .page {

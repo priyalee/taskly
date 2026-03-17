@@ -10,7 +10,7 @@ let currentPageIndex = 0;
 let allTasks = [];
 let showAllPages = false;
 let previewPage = 0;
-const previewLimit = 12;
+const previewLimit = 10;
 
 /*TASKS PER PAGE CALCULATION*/
 function getTasksPerPage() {
@@ -296,20 +296,20 @@ notebook.addEventListener("touchend", (e) => {
 });
 
 /*SAMPLE TASKS*/
-const tasks = [
-  "Buy groceries",
-  "Finish project",
-  "Call friend",
-  "Clean room",
-  "Read a book",
-  "Workout",
-  "Study JavaScript",
-  "Reply to emails",
-];
+// const tasks = [
+//   "Buy groceries",
+//   "Finish project",
+//   "Call friend",
+//   "Clean room",
+//   "Read a book",
+//   "Workout",
+//   "Study JavaScript",
+//   "Reply to emails",
+// ];
 
-for (let i = 0; i < 160; i++) {
-  const random = tasks[Math.floor(Math.random() * tasks.length)];
-  allTasks.push(random + " " + (i + 1));
-}
+// for (let i = 0; i < 60; i++) {
+//   const random = tasks[Math.floor(Math.random() * tasks.length)];
+//   allTasks.push(random + " " + (i + 1));
+// }
 
 renderPages();
